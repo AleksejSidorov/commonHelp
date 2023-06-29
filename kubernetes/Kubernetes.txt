@@ -73,6 +73,3 @@ kubectl port-forward [deploymentName] [hostPort]:[appPort] - прокинуть 
 
 
 
-
-
-
