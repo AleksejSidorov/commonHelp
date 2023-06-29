@@ -1,0 +1,94 @@
+ID : sidorovalexeytest
+PASSWORD : mokujin31337
+ЕСЛИ НЕТ apt-get / apt-install и т.д., ТО НУЖНО ПРОПИСАТЬ hostname
+
+docker - вывести список команд и флагов
+
+docker ps -a  -  просмотреть все контейнеры
+docker stop [container_name/cash]  -  остановить контейнер
+docker start [container_name/cash]  -  запустить контейнер
+docker kill [container_name/cash]  -  принудительно остановить контейнер
+docker exec -it [container_name/cash] bash - запуск bash на уже ЗАПУЩЕННОМ контейнере
+docker run -it [container_name/cash] bash - флаги -i -t говорят, что бы был сеанс интерактивной работы на подключаемом терминале
+docker start -i [container_name/cash] - запуск вместе с bash, но если run выполнялся с -i -t, иначе никак
+docker inspect [container_name/cash] - информация о контейнере
+docker rename [container_name/cash] [newName] - переименовать контейнер в [newName]
+
+docker pull [image_name/cash]:[version] - стянуть образ с hub, versio по умолчанию lates - не рекомендуется,
+						т.к. каждый раз будет тянуть более новую
+docker run --name=[container_newName] - container_newName имя будущего контейнера
+	    -P - предоставить все порты
+	    -p [host_ip]:[host_port]:[docker_port] - host_ip - можно и не указывать
+						     host_port - порт открытый на машине
+						     docker_port - порт на докере		
+	   --rm - удалить контейнер после его остановки
+	   --hostname=[container_newHostname] - container_newHostname имя хоста для DNS
+
+DOCKER NETWORK
+ПО docker СЕТЯМ - https://linux-notes.org/rabota-s-setju-networking-v-docker/
+		- https://habr.com/ru/post/333874/
+СЕТИ ДЕЛЯТСЯ НА bridge, host, Macvlan, overlay (ЭТО ДРАЙВЕРА driver)
+	-bridge - сеть между контейнерами
+	-host - удаленная сетевая изоляция между контейнером и хостом
+	-Macvlan - присвоить MAC адресс, отображая как физ. устройство в вашей сети
+	-overlay - наложенная сеть, для соединения нескольких демонов между собой
+	-none - это драйвер, отключает сеть контейнеров, для использования пользовательских сетевых драйверов
+docker network ls - просмотр доступных сетей
+docker network inspect [network_name] - показать свойства сети
+docker network create --driver=[driver_name] [network_name] - создать сеть
+docker network create --subnet 172.10.0.0/16 --ip-range 172.10.240.0/20 my-net - где:
+		- --subnet - подсеть
+		- --ip-range - диапазон динамических адресов, выдаваемых контейнерам при подключении
+docker network connect --alias [host_name] --ip [ip_adress] [network_name] [container_name] - пояснение:
+		подключение [container_name] к сети [network_name] с хостом [hpst_name] с ip [ip-adress] ПРИМЕЧАНИЕ:
+		подключив единожды, контейнер всегда в дальнейшем будет подключаться так же. Если адрес занят, то
+		будет провал, так что при подключении нового контейнера, указывать ip за диапазоно старого.
+"com.docker.network.bridge.enable_icc"="false" - если это указать, при создании сети, то взаимодействия между 
+						 контейнерами не будет (ЭТО ФИЛЬТР)
+
+
+DOCKER FILE
+docker build -f [path_to_dockerfile] . - собрать из docker файла, не забыть про точку.
+					Dockerfile - название файла именно такое, без расширения 
+# - используется для комментария
+FROM [image_name]:[version] - из какго image будет сделан контейнер
+		пример: FROM ubuntu:18.04
+LABEL [meta_info] - метаданные, к примеру кто создал образ
+		пример: LABEL maintainer="cobetckoeyxo@mail.ru"
+ENV - устанавливает постоянные среды (?создания констант)
+		пример: ADMIN="jeff"
+RUN - используется для установки пакетов, к примеру apt-get update,
+	можно несколько, НО!!!, может быть перебита из консоли при сборке 
+		пример: RUN apt-get update && apt-get install cowsay - это для shell
+		пример: RUN ["mkdir", "/a_directory"] - это для batch
+COPY [path_from_host] [path_to_container] - скопировать файлы из машины в контейнер
+		пример: COPY . ./app
+ADD - копирует файлы и папки в контейнер, может распаковать локальные .tar файлы,
+      может загружать файлы из удалённых источников, пример: 
+ADD https://raw.githubusercontent.com/master/sample_vids/vid1.mp4 \/my_app_directory 
+      здесь копируется файл по URL в /my_app_directory
+CMD - команда при запуске контейнера, пример: CMD ["java", "-jar", "hello_world.jar"] пояснение:
+	запустить jar файл при запуске контейнера. НО!!! Только одна!!!
+WORKDIR - задает рабочую директорию для следующей инструкции,если нет такой - создаст,
+	  можно использовать несколько раз,все дальнейшие COPY,ADD,RUN,CMD,ENTRYPOINT 
+		по умолчанию, будут работать с WORKDIR 
+		пример: /usr/src/my_app_directory
+ARG - задаёт переменные для передачи Docker во время сборки образа				???
+		пример: ARG my_var=my_value - можем my_value передать через командную строку,
+			через переменную my_value
+ENTRYPOINT - предоставляет команду с аргументами для вызова во время выполнения контейнера.	???
+							     Аргументы не переопределяются.
+EXPOSE - указывает на необходимость открыть порт, но не открывает его
+VOLUME - создаёт точку монтирования для работы с постоянным хранилищем, можно указать
+	 директорию, которая будет общей для контейнера и машины 
+
+
+docker-compose
+	конфигурирование с помощью yaml
+	
+
+
+
+
+
+

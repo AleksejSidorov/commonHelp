@@ -1,0 +1,2 @@
+Разбиение на сервисы по бизнес возможностям (Enterprise Architech)
+Event storming

@@ -1,0 +1,11 @@
+sidorovAlexeyTest@yandex.ru
+mokujin31337
+
+ssh user_name@ip - подконнектится по публичному ip
+ssh -J user_name@public_ip:port user_name@local_ip:port - подконнектится к машине через proxy (client -> server(ssh1) -> remote(ssh1)),
+						          где server и remote в одной подсети. 
+ssh -J <jump server1>,<jump server2>,<jump server3> <remote server> - несколько jump
+
+pritunl
+username: "pritunl"
+password: "OpQpBhIir7sz"

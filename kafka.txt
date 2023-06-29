@@ -1,0 +1,20 @@
+1) запускаем zookeeper
+2) запускаем kafka (должен быть связан с zookeeper)
+3) создаём топики
+4) можем использовать producer console
+5) мoжем использовать consumer console
+6) из java можем создавать и управлять топиками. Читать и записывать в них
+
+
+
+показать список топиков - /bin/kafka-topics --list --bootstrap-server kafka:9092
+создать топик [mytopic] - 
+	/bin/kafka-topics --create --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 --topic mytopic
+удалить топик [mytopic] - 
+	/bin/kafka-topics --bootstrap-server kafka:9092  --delete --topic mytopic
+
+запуск producer_console - 
+	/bin/kafka-console-producer --broker-list localhost:9092 --topic [topic_name]
+запуск consumer_console - 
+	/bin/kafka-console-consumer --bootstrap-server localhost:9092 --topic [topic_name] --from-beginning
+
