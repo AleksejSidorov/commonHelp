@@ -1,0 +1,38 @@
+Probes - это проверка исправности работы приложения
+	Три вида:
+	- Liveness Probe:
+		Контроль за состаянием приложения во время его жизни
+		Исполняется постоянно
+	- Readness Probe:
+		Проверяет, готово ли приложение принимать трафик
+		В случае неудачного выполнения приложение убирается из балансировки
+		Исполняется постоянно
+	- Startup Probe
+		Проверяет, запустилось ли приложение
+		Используется при старте
+		
+      containers:
+        readinessProbe:
+          failureThreshold: 3 - колличество fail проверок
+          successThreshold: 1 - колличество success проверок
+          httpGet:
+            path: / - путь обращения, по которому должен прийти ответ от 200 до 399
+            port: 8081
+          periodSeconds: 15 - через какой период проверять
+          timeoutSeconds: 10 - сколько ждать ответа
+        livenessProbe:
+          failureThreshold: 3
+          successThreshold: 1
+          httpGet:
+            path: /
+            port: 8081
+          periodSeconds: 15
+          timeoutSeconds: 10
+          initialDelaySeconds: 10  - раньше использовалось, это время ожидания, до того, как начать проеврки(задержка на время запуска app)
+        startupProbe:
+          failureThreshold: 30
+          httpGet:
+            path: /
+            port: 8081
+          periodSeconds: 15
+          timeoutSeconds: 10
