@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hello
+spec:
+# * - отвечает за минуты (*/1 - каждую минуту)
+# * - отвечает за часы
+# * - за дни
+# * - месяцы
+# * - дни недели
+  schedule: "*/1 * * * *"
+  #параллельный запсук Job(на тот случай, если певый ещё не отработал, а время запускать второй)
+  #Allow - позволять
+  #Forbid - запретить(если предыдущий не отработал, новый не запуститься)
+  #Replace - заменяет текущий Job на новый, если первый не успевает выполниться
+  concurrencyPolicy: Forbid
+  #какое колличество job будет храниться в истории, если они закончаться положительно(success)
+  successfulJobsHistoryLimit: 1
+  #какое колличество job будет храниться в истории, если они закончаться отрицательно(fail)
+  failedJobsHistoryLimit: 1
+  #временное отклонение на запуск Job связанное непосредственно с его запуском, 
+  #т.е. мы даём дельту, в течении какого времени Job должен стартовать
+  #иначе, один такт будет пропущен, и далее будет запускаться следующая job
+  startingDeadlineSeconds: 15
+  jobTemplate:
+    spec: 
+      backoffLimit: 2
+      activeDeadlineSeconds: 100
+      template:
+        spec:
+          containers:
+          - name: hello
+            image: quay.io/prometheus/busybox
+            args: 
+            - /bin/sh
+            - -c
+            - date; echo Hello from the Kubernetes cluster
+          restartPolicy: Never
