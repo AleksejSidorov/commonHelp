@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hello
+spec:
+  #время жизни после того, как он отработал
+  ttlSecondsAfterFinished: 100
+  #время на выполнение Job
+  activeDeadlineSeconds: 60
+  #колличестыо неудачных попыток
+  backoffLimit: 5
+  #колличество успешных запусков
+  complitions: 3
+  #сколько подов запускать параллельно
+  parallelism: 2
+  template:
+    spec:
+      containers:
+      - name: hello
+        image: quay.io/prometheus/busybox
+        # command: ["perl",  "-Mbignum=bpi", "-wle", "print bpi(2000)"]
+        args: 
+        - /bin/sh
+        - -c
+        - date; echo Hello from the Kubernetes cluster
+      restartPolicy: Never
