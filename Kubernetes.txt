@@ -7,6 +7,7 @@
 Основные комманды для minikube:
 	
 minikube image ls --format table - вывессти список images в виде таблички
+minikube image build . -t [imageNage]:[tag] - билд image с именем и тегом с Dockerfile
 
 Основные команды kubectl
 
