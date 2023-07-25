@@ -34,5 +34,5 @@ spec:
             args: 
             - /bin/sh
             - -c
-            - date; echo Hello from the Kubernetes cluster
+            - echo Hello from the Kubernetes cluster
           restartPolicy: Never
