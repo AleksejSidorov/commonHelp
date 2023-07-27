@@ -1,0 +1,27 @@
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hpa-apache
+spec:
+  #Что именно скайлим
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: php-apache
+  #Ограничения скейлинга
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    #развновиности метрик в файле ../HorizontalPodAuto.txt
+  - type: Resource
+    resource:
+      #имя request или CPU или Memory
+      name: CPU
+      target:
+        type: Utilization
+        #процент от request по CPU
+        averageUtilization: 50
+        #конкретное значение по CPU
+        averageValue: 50m
+...    
