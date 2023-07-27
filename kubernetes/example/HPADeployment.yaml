@@ -1,0 +1,29 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-apache
+  labels: 
+    app: php-apache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: php-apache
+  template:
+    metadata:
+      labels:
+        app: php-apache
+    spec:
+      containers:
+      - image: k8s.gcr.io/hpa-example
+        name: hpa-example
+        #Специально сделали ограничение для того
+        #что бы HPA его подхватил. HPA смотрит только на requests
+        resources:
+          requests: 
+            cpu: 100m
+          limits:
+            cpu: 100m
+            memory: 250Mi
+...

@@ -1,0 +1,80 @@
+HPA - horizontal Pod Autoscaler, это автоматическое расширение колличества подов или их уменьшение, 
+	согласно логике scaler прописанной в deployment. Самый простой пример - увеличение коллиства
+	согласно нагрузке, но для этого, нужно знать какая именно нагрузка на подах, по этому нужно запустить 
+	MetricServer и отталуивясь от его данных что-то делать.
+
+
+	    _____________
+	   |		 |
+  HPA------|--->Scale 	 |
+	   |             |
+	   | Deployment	 |
+	   |_____________|
+	   	|
+	   	|---------> Pod1
+	   	|---------> Pod2
+	   	|---------> ...
+	   	----------> PodN
+	   	
+Для использования HPA - в Deployment обязательно должен быть прописан requests (это в resources), согласно условию 
+			указанному в нём и будет проходить сам HPA.
+			
+Разновидности metrics: type: 
+		- Resources - или CPU или Memory, по ним отслеживание по:
+				- AverageUtilization(процент от заданного в request в deploy)
+				- AverageValue(именно предельное значение, пример по CPU - 50m)
+				Можно указать сразу два, но не уверен, что это так работает
+		- Pods - кастомные метрики. Т.е., если наше приложение будет отдавать какие-нибудь метрики, к примеру через 
+			 Prometheus, то можно использовать любую из них для автоскейлинга. Есть только AverageValue.
+			 пример:
+
+			 	type: Pods
+			 	pods:
+			 	  metrics:
+			 	    name: packets-per-second
+			 	  target:
+			 	    type: AverageValue
+			 	    averageValue 1k
+			 	    
+		- Object - по метрикам любого объекта самого Kubernetes.
+				пример:
+				 type: Object
+				 object:
+				   metrics:
+				     name: request-per-second
+				   describedObject:
+				     apiVersion: extensions/v1beta1 (эта версия api устарела для ingress)
+				     kind: Ingress
+				     name: myApp
+				   target:
+				     type: AverageValue
+				     averageValue: 2k
+		- External - скейлинг относмтельно внешних сервисов мониторинга, а не от объектов Kubernetes.
+				К примеру от сервера Prometheuse
+				пример: 
+					type: External
+					external:
+					  metrics:
+					    name: queue_messages_ready
+					    selector: "queue=worker_tasks"
+					  target:
+					    type: AverageVaue
+					    averageValue: 30
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+
+	  

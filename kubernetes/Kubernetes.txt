@@ -26,8 +26,12 @@ kubectl describe [pod, rs, deploy, service, cm, secret] [name] - получит�
 									     secret
 kubectl create -f [pathToFile.yaml] - создать абстракцию описанную в pathToFile.yaml
 kubectl apply -f [pathToFile.yaml] - создать или обновить абстракцию описанную в pathToFile.yaml
+kubectl get pod -w - покажет текущее состяние pod онлайн, и будет его онлайн отслеживать(-w сокращение от watch)
 
 kubectl port-forward [deploymentName] [hostPort]:[appPort] - прокинуть порт приложения на host(локальную машину)
+kubectl expose deployment [deploymentName] --port 80 - создать svc и прокинуть порт 80 на порт 80
+kubectl autoscale deployment [deploymentName] --cpu-percent=50 --min=1 --max=5 - задать HPA с условием по CPU 
+										и ограничением на колличесво POD (min, max)
 
 ---------------
 Необходимо разобраться с:

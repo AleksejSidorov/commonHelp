@@ -1,0 +1,28 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hpa-v2-test
+spec:
+  scaleTargetRef:
+    #что именно автоскуйлить
+    apiVersion: apps/v1
+    kind: Deployment
+    name: hpa-v2-test
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+    #тип от куда получать метрики
+  - type: Object
+    object: 
+      metric:
+        #имя метрики
+        name: nginx_ingress_controller_requests_per_second
+      describedObject:
+        #описание объекта, от которого получаем метрики  
+        apiVersion: networking.k8s.io/v1
+        kind: Ingress
+        name: hpa-v2-test
+      target:
+        #триггер для автоскейлинга
+        type: AverageValue
+        averageValue: "10"
