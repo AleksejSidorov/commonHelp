@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-{{ .Release.Name }}
+  labels:
+    app: {{ .Chart.Name }}-{{ .Release.Name }}
+#annotations - указание просто ключ - значение.
+#оператор if проверяет annotations == null,
+#и если нет - то подставит значения.
+# минусы "-" перед if и end, говорят helm, удалить пустуюс строку, 
+#если annotations == null 
+{{- if .Values.annotations }}
+  annotations:
+{{ toYaml .Values.annotations | indent 4}}
+#обозначение завершения оператора if
+{{- end }}
+spec:
+  replicas: {{ .Values.replicas | default 2 }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}-{{ .Release.Name }}
+    template:
+      metadata:
+        labels:
+          app: {{ .Chart.Name }}-{{ .Release.Name }}
+      spec: 
+        containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          ports:
+          - containerPort: {{ .Values.port }}
+          resources:
+          #говорим helm, что бы он взял целиком всё, что лежит в resources при помощи функции toYaml,
+          #а с помощью indent - на сколько пробелов сдвинуть блок resources
+{{ toYaml .Values.resources | indent 10 }}
+          #здесь мы вставляем все значения env: 
+          #                                - name: $key
+          #                                  value: $value
+          #из values, если они есть
+{{- if .Values.env }}
+          env:
+          {{- range $key, $val := .Values.env }}
+          #quota - убирает лишние кавычки
+          - name: {{ $key | quote }}
+            value: {{ $val | quote }}
+          {{- end }}
+{{- end }}
+...

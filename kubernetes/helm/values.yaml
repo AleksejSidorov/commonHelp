@@ -1,0 +1,20 @@
+replicas: 3
+image:
+  repository: nginx
+  tag: 1.14.2
+port: 80
+resources: 
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  request:
+    cpu: 80m
+    memory: 64Mi
+annotations:
+  one: two
+  foo: bar
+env:
+  MYSQL_PORT: 3306
+  MYSQL_LOGIN: login
+  MYSQL_PASSORD: password
+

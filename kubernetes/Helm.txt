@@ -1,0 +1,109 @@
+Helm - Пакетный менеджер kubernetes(есть схожесть с apt-get).
+	Позволяет хранить и версионировать манифесты в качестве secret.
+	Является одним из видов темплейтирования. Является продуктом CNCF.
+	Реализует декларативный подход.
+	Есть важные способности для построения CD(continue deloyment)
+		- Watch - позволяет отслеживать деплой
+		- Rollback - автоматический роллбек, если есть проблемы
+		- Hooks - позможность пстроение очередности деплоинга
+	Есть система плагинов, но не особо восстребованые. 
+	
+Пакет - в виде .tgz - который называется сhart, представляет из себя:
+		- Набор темплейтированных манифестов 
+		- Файл со значениями переменных
+		- Мета
+
+Пример темплейтирования: 
+
+  Допустим есть deployment.yaml:
+ 		
+ 		apiVersion: apps/v1
+ 		kind: Deployment
+ 		metadata:
+ 		  name: nginx-deployment
+ 		  labels:
+ 		    app: nginx
+ 		spec:
+ 		  replicas: 3
+ 		  selector:
+ 		    matchLabels:
+ 		      app: nginx
+ 		  template:
+ 		    metadata:
+ 		      labels:
+ 		        app: nginx
+ 		    spec: 
+ 		    containers:
+ 		    - name: nginx
+ 		      image: nginx:1.14.2
+ 		      ports:
+ 		      - containerPort: 80
+ 		      
+  Сделаем несколько полей переменными, для удобства управления. Переменные пишуться на языке Go-template
+
+		apiVersion: apps/v1
+ 		kind: Deployment
+ 		metadata:
+ 		  name: {{.Release.Name}}
+ 		  labels:
+ 		    app: {{.Chart.Name}}
+ 		    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+ 		    release: {{.Release.Name}}
+ 		spec:
+ 		  replicas: {{.Value.replicas | default 2}}
+ 		  selector:
+ 		    matchLabels:
+ 		      app: {{.Chart.Name}}
+ 		      release: {{.Release.Name}}
+ 		  template:
+ 		    metadata:
+ 		      labels:
+ 		        app: {{.Chart.Name}}
+ 		        chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+ 		        release: {{.Release.Name}}
+ 		    spec: 
+ 		    containers:
+ 		    - name: app
+ 		      image: "{{.Values.image.repository}}:{{.Values.image.tag}}"
+ 		      ports:
+ 		      - containerPort: {{.Values.service.port}}
+ 		      
+   И создадим файл со значением переменных, которые и будут использоваться в манифетах values.yaml:
+   		
+   		image:
+   		  repository: nginx
+   		  tag: stable
+   		replicas: 2
+   		service:
+   		  port: 80
+   		  
+   		resources: 
+   		  limits:
+   		    cpu: 100m
+   		    memory: 128Mi
+   		  request:
+   		    cpu: 80m
+   		    memory: 64Mi
+   
+   Helm залезет из манифеста deployment.yaml в values.yaml и подтянет от туда значения. Если значения отсутствует, 
+   то оно подставиться или из значения default, как в случае с указанием replicas, или из командной строки, при том
+   что значения командной строки более весома, чем default или того, что указано в файлах. К примеру, что бы посмотреть
+   что именно будет темплейтировано, используется команда:
+   
+   helm template .
+   
+   а, что-бы подставить значение в {{ .Value.image.tag }}, можно прописать
+   
+   helm template . --name-template=foobar --set image.tag=1.14.2 - где через --set можно прописать любую переменную, --name-template=foobar - Chart.version
+   
+   Пример прописан в папке helm/template. Осталось изучить в go-template функцию include.
+   
+helm create chartname - создаёт стартер - предзаготовку шаблона с именем chartname
+   		  
+   		  
+   		  
+   		
+   		
+   		
+  		
+  
